@@ -1,0 +1,47 @@
+@keyframes slidein {
+
+  from {
+    transform: translateY(100vh);
+  }
+
+  to {
+    transform: translateY(0%);
+  }
+}
+
+@keyframes slideout {
+
+  from {
+    transform: translateY(0%);
+  }
+
+  to {
+    transform: translateY(100vh);
+  }
+}
+
+@keyframes shake {
+  
+
+  10%,
+  90% {
+    transform: translate3d(-1px, 0, 0);
+    box-shadow: 0 0 20px #b04a4a;
+  }
+
+  20%,
+  80% {
+    transform: translate3d(2px, 0, 0);
+  }
+
+  30%,
+  50%,
+  70% {
+    transform: translate3d(-2px, 0, 0);
+  }
+
+  40%,
+  60% {
+    transform: translate3d(2px, 0, 0);
+  }
+}
