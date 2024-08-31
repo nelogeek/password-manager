@@ -60,16 +60,6 @@ const saveChanges = (): void => {
   }
 };
 
-
-// const resetShakeAnimation = () => {
-//   showShakeAnimation.value = false;
-// };
-
-// Удаление класса shake после завершения анимации
-// const onAnimationEnd = () => {
-//   resetShakeAnimation();
-// };
-
 var scrollWidth: number = 0;
 
 onMounted(() => {
@@ -100,7 +90,7 @@ onUnmounted(() => {
         <img class="Popup__BtnCloseImg" src="/src/assets/img/cross.png" alt="">
       </button>
     </div>
-    <!-- @animationend="onAnimationEnd" -->
+
     <div class="Popup__contentArea" :class="{ Popup__error: showShakeAnimation }">
       <div class="Popup__content" :class="{ Popup__itemHidden: isHidden }">
         <h2 class="">Детали</h2>
