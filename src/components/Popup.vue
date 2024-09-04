@@ -18,10 +18,18 @@ const isHidden = ref<boolean>(false);
 const isPasswordVisible = ref<boolean>(false);
 const isPasswordGenerated = ref<boolean>(!!detailPassword.value);
 const showShakeAnimation = ref<boolean>(false);
+const maxLength = ref<number>(12); // Длина пароля, задаваемая в чекбоксе
 
 watch([title, detailPassword], () => {
   isPasswordVisible.value = false;
   isPasswordGenerated.value = !!detailPassword.value;
+});
+
+// Обработчик изменения длины пароля
+watch([detailPassword], () => {
+  if (detailPassword.value.length > maxLength.value) {
+    detailPassword.value = detailPassword.value.slice(0, maxLength.value);
+  }
 });
 
 const togglePasswordVisibility = (): void => {
@@ -29,11 +37,17 @@ const togglePasswordVisibility = (): void => {
 };
 
 const generatePassword = (password: string): void => {
-  detailPassword.value = password;
+  detailPassword.value = password.slice(0, maxLength.value); // Обрезаем пароль до заданной длины
   isPasswordGenerated.value = true;
 };
 
-
+// Функция для изменения длины пароля
+const setPasswordLength = (length: number): void => {
+  maxLength.value = length;
+  if (detailPassword.value.length > maxLength.value) {
+    detailPassword.value = detailPassword.value.slice(0, maxLength.value);
+  }
+};
 
 const closePopup = (): void => {
   isHidden.value = true;
@@ -44,13 +58,11 @@ const closePopup = (): void => {
 
 const saveChanges = (): void => {
   if (!title.value || !detailPassword.value) {
-    // Если хотя бы одно поле не заполнено, сбросим и снова включим анимацию shake
     showShakeAnimation.value = false;
     setTimeout(() => {
       showShakeAnimation.value = true;
-    }, 0); // Небольшая задержка для сброса анимации
+    }, 0);
   } else {
-    // Если все поля заполнены, выполнить логику сохранения
     isHidden.value = true;
     showShakeAnimation.value = false;
     setTimeout(() => {
@@ -83,6 +95,7 @@ onUnmounted(() => {
 });
 </script>
 
+
 <template>
   <section class="Popup__overlay" @click.self="closePopup()">
     <div class="Popup__BtnCloseArea">
@@ -94,13 +107,15 @@ onUnmounted(() => {
     <div class="Popup__contentArea" :class="{ Popup__error: showShakeAnimation }">
       <div class="Popup__content" :class="{ Popup__itemHidden: isHidden }">
         <h2 class="">Детали</h2>
-        <label for="title">Сервис:</label>
-        <input type="text" v-model="title" placeholder="Title" />
+        <label class="Popup__contentTitle" for="title">Сервис:</label>
+        <input class="Popup__passwordInput" type="text" v-model="title" placeholder="Title" />
 
-        <label for="password">Пароль:</label>
+        <label class="Popup__contentTitle" for="password">Пароль:</label>
+
+        
         <div class="Popup__passwordField">
           <input :type="isPasswordVisible ? 'text' : 'password'" v-model="detailPassword" placeholder="Password"
-            class="Popup__passwordInput" maxlength="12" />
+            class="Popup__passwordInput" />
 
           <PasswordGenerator v-if="!isPasswordGenerated" @generate="generatePassword" />
 
@@ -108,6 +123,15 @@ onUnmounted(() => {
             {{ isPasswordVisible ? 'Скрыть' : 'Показать' }}
           </button>
         </div>
+
+        <div class="Popup__passwordLenght">
+          <label class="Popup__contentTitle" for="length">Длина пароля:</label>
+          <input type="number" id="length" v-model.number="maxLength" min="1" max="128"
+            class="Popup__passwordInputLenght" />
+        </div>
+
+
+
         <div class="Popup__areaBtn">
           <button class="Popup__saveBtn" @click="saveChanges">Сохранить</button>
           <button class="Popup__closeBtn" @click="closePopup()">Закрыть</button>
@@ -116,6 +140,7 @@ onUnmounted(() => {
     </div>
   </section>
 </template>
+
 
 <style lang="scss">
 .Popup__overlay {
@@ -191,11 +216,19 @@ onUnmounted(() => {
   color: black;
 }
 
-.Popup__content label {
-  font-size: 12px;
+.Popup__contentTitle {
+  font-size: 10px;
 }
 
-.Popup__content input {
+.Popup__passwordField {
+  position: relative;
+  display: grid;
+  align-items: center;
+}
+
+.Popup__passwordInput {
+  position: relative;
+  flex: 1;
   font-family: 'Google Sans Regular';
   font-weight: 400;
   width: 100%;
@@ -206,15 +239,20 @@ onUnmounted(() => {
   outline: none;
 }
 
-.Popup__passwordField {
-  position: relative;
+.Popup__passwordLenght {
   display: flex;
   align-items: center;
+  gap: 10px;
+  margin-bottom: 10px;
 }
 
-.Popup__passwordInput {
-  position: relative;
-  flex: 1;
+.Popup__passwordInputLenght {
+  font-family: "Google Sans Regular";
+  font-weight: 400;
+  padding: 5px 8px;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  outline: none;
 }
 
 .Popup__toggleBtn {
@@ -276,5 +314,4 @@ onUnmounted(() => {
     background-color: #959ea6;
   }
 }
-
 </style>
